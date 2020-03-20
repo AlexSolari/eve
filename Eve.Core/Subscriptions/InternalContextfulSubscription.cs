@@ -6,7 +6,7 @@ using System.Text;
 namespace Eve.Core.Subscriptions
 {
     internal class InternalContextfulSubscription<TEvent, TEventContext> : ISubscription<TEvent, TEventContext>
-        where TEvent : IContexfulEvent
+        where TEvent : IContextfulEvent
         where TEventContext : IEventContext<TEvent>
     {
         private Action<TEventContext> callback;

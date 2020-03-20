@@ -6,7 +6,7 @@ using System.Text;
 namespace Eve.Core.Subscriptions
 {
     public interface ISubscription<TEvent, TEventContext> : ISubscription
-        where TEvent : IContexfulEvent
+        where TEvent : IContextfulEvent
         where TEventContext: IEventContext<TEvent>
     {
         void Handle(TEventContext context);

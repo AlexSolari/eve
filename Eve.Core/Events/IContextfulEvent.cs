@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Eve.Core.Events
 {
-    public interface IContexfulEvent : IEvent
+    public interface IContextfulEvent : IEvent
     {
     }
 }

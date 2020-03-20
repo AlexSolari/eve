@@ -7,10 +7,11 @@ namespace Eve
 {
     public class EventHandler
     {
-        private Dictionary<string, LinkedList<ISubscription>> Subscriptions = new Dictionary<string, LinkedList<ISubscription>>();
+        private object lockObject = new object();
+        private Dictionary<string, List<ISubscription>> Subscriptions = new Dictionary<string, List<ISubscription>>();
 
         public ISubscription<TEvent, TEventContext> Subscribe<TEvent, TEventContext>(ISubscription<TEvent, TEventContext> subscription)
-            where TEvent : IContexfulEvent
+            where TEvent : IContextfulEvent
             where TEventContext : IEventContext<TEvent>
         {
             AddSubscription<TEvent>(subscription);
@@ -27,7 +28,7 @@ namespace Eve
         }
 
         public ISubscription<TEvent, TEventContext> Subscribe<TEvent, TEventContext>(Action<TEventContext> action) 
-            where TEvent : IContexfulEvent
+            where TEvent : IContextfulEvent
             where TEventContext : IEventContext<TEvent>
         {
             var subscription = new InternalContextfulSubscription<TEvent, TEventContext>(action);
@@ -48,7 +49,7 @@ namespace Eve
         }
 
         public void Unsubscribe<TEvent, TEventContext>(ISubscription<TEvent, TEventContext> subscription)
-            where TEvent : IContexfulEvent
+            where TEvent : IContextfulEvent
             where TEventContext : IEventContext<TEvent>
         {
             var wasRemoved = false || RemoveSubscription(subscription, GetEventKey<TEvent>());
@@ -69,7 +70,7 @@ namespace Eve
         }
 
         public void Dispatch<TEvent, TEventContext>(TEventContext context)
-            where TEvent : IContexfulEvent
+            where TEvent : IContextfulEvent
             where TEventContext : IEventContext<TEvent>
         {
             var key = GetEventKey<TEvent>();
@@ -77,10 +78,7 @@ namespace Eve
             {
                 var subscriptionsToNotify = Subscriptions[key];
 
-                foreach (var subscription in subscriptionsToNotify)
-                {
-                    (subscription as ISubscription<TEvent, TEventContext>).Handle(context);
-                }
+                subscriptionsToNotify.ForEach(subscription => ((ISubscription<TEvent, TEventContext>)subscription).Handle(context));
             }
         }
 
@@ -92,29 +90,35 @@ namespace Eve
             {
                 var subscriptionsToNotify = Subscriptions[key];
 
-                foreach (var subscription in subscriptionsToNotify)
-                {
-                    (subscription as ISubscription<TEvent>).Handle();
-                }
+                subscriptionsToNotify.ForEach(subscription => ((ISubscription<TEvent>)subscription).Handle());
             }
         }
 
         private bool RemoveSubscription(ISubscription subscription, string key)
         {
-            var eventSubscriptions = Subscriptions[key];
+            var result = false;
 
-            return eventSubscriptions.Remove(subscription);
+            lock (lockObject)
+            {
+                var eventSubscriptions = Subscriptions[key];
+                result = eventSubscriptions.Remove(subscription);
+            };
+
+            return result;
         }
         private void AddSubscription<TEvent>(ISubscription subscription)
             where TEvent : IEvent
         {
             var key = GetEventKey<TEvent>();
-            if (!Subscriptions.ContainsKey(key))
+            lock (lockObject)
             {
-                Subscriptions.Add(key, new LinkedList<ISubscription>());
-            }
+                if (!Subscriptions.ContainsKey(key))
+                {
+                    Subscriptions.Add(key, new List<ISubscription>());
+                }
 
-            Subscriptions[key].AddLast(subscription);
+                Subscriptions[key].Add(subscription);
+            };
         }
         private string GetEventKey<TEvent>()
         {
