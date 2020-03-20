@@ -1,0 +1,8 @@
+C:\Users\AHA\source\repos\Eve\Eve.Core\bin\Debug\netstandard2.0\Eve.Core.deps.json
+C:\Users\AHA\source\repos\Eve\Eve.Core\bin\Debug\netstandard2.0\Eve.Core.dll
+C:\Users\AHA\source\repos\Eve\Eve.Core\bin\Debug\netstandard2.0\Eve.Core.pdb
+C:\Users\AHA\source\repos\Eve\Eve.Core\obj\Debug\netstandard2.0\Eve.Core.csprojAssemblyReference.cache
+C:\Users\AHA\source\repos\Eve\Eve.Core\obj\Debug\netstandard2.0\Eve.Core.AssemblyInfoInputs.cache
+C:\Users\AHA\source\repos\Eve\Eve.Core\obj\Debug\netstandard2.0\Eve.Core.AssemblyInfo.cs
+C:\Users\AHA\source\repos\Eve\Eve.Core\obj\Debug\netstandard2.0\Eve.Core.dll
+C:\Users\AHA\source\repos\Eve\Eve.Core\obj\Debug\netstandard2.0\Eve.Core.pdb
