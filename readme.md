@@ -1,6 +1,8 @@
 # Eve
 Lightweight event management system.
 
+https://www.nuget.org/packages/Eve/1.0.0
+
 ## Usage
 Create a new instance of `EventHandler` and use it to manage events via Subscribe, Unsubscribe and Dispatch operations.
 
