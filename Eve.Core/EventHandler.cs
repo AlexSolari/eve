@@ -58,6 +58,16 @@ namespace Eve
             }
         }
 
+        public void Unsubscribe<TEvent>(ISubscription<TEvent> subscription)
+            where TEvent : IContextlessEvent
+        {
+            var wasRemoved = false || RemoveSubscription(subscription, GetEventKey<TEvent>());
+            if (!wasRemoved)
+            {
+                throw new ArgumentException("Subscription cannot be removed since it is not registered in a system.");
+            }
+        }
+
         public void Dispatch<TEvent, TEventContext>(TEventContext context)
             where TEvent : IContexfulEvent
             where TEventContext : IEventContext<TEvent>
