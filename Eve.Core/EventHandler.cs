@@ -10,6 +10,8 @@ namespace Eve
         private object lockObject = new object();
         private Dictionary<string, List<ISubscription>> Subscriptions = new Dictionary<string, List<ISubscription>>();
 
+        #region Public API
+        
         public ISubscription<TEvent, TEventContext> Subscribe<TEvent, TEventContext>(ISubscription<TEvent, TEventContext> subscription)
             where TEvent : IContextfulEvent
             where TEventContext : IEventContext<TEvent>
@@ -73,6 +75,11 @@ namespace Eve
             where TEvent : IContextfulEvent
             where TEventContext : IEventContext<TEvent>
         {
+            if (context == null)
+            {
+                throw new ArgumentException("Context cannot be null");
+            }
+
             var key = GetEventKey<TEvent>();
             if (Subscriptions.ContainsKey(key))
             {
@@ -94,21 +101,39 @@ namespace Eve
             }
         }
 
+        #endregion
+
+        #region Internals
+
         private bool RemoveSubscription(ISubscription subscription, string key)
         {
+            if (subscription == null)
+            {
+                throw new ArgumentException("Subscription cannot be null");
+            }
+
             var result = false;
 
             lock (lockObject)
             {
-                var eventSubscriptions = Subscriptions[key];
-                result = eventSubscriptions.Remove(subscription);
+                if (Subscriptions.ContainsKey(key))
+                {
+                    var eventSubscriptions = Subscriptions[key];
+                    result = eventSubscriptions.Remove(subscription);
+                }
             };
 
             return result;
         }
+
         private void AddSubscription<TEvent>(ISubscription subscription)
             where TEvent : IEvent
         {
+            if (subscription == null)
+            {
+                throw new ArgumentException("Subscription cannot be null");
+            }
+
             var key = GetEventKey<TEvent>();
             lock (lockObject)
             {
@@ -117,12 +142,20 @@ namespace Eve
                     Subscriptions.Add(key, new List<ISubscription>());
                 }
 
+                if (Subscriptions[key].Contains(subscription))
+                {
+                    throw new ArgumentException("This subscription is already registered in a system. Try creating new subscription instead.");
+                }
+
                 Subscriptions[key].Add(subscription);
             };
         }
+
         private string GetEventKey<TEvent>()
         {
             return typeof(TEvent).FullName;
         }
+
+        #endregion
     }
 }
