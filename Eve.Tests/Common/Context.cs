@@ -9,4 +9,9 @@ namespace Eve.Tests.Common
     {
         public int Data { get; set; }
     }
+
+    public class DualContext : IEventContext<DualEvent>
+    {
+        public int Data { get; set; } = 42;
+    }
 }

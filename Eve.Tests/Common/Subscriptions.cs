@@ -20,4 +20,37 @@ namespace Eve.Tests.Common
 
         }
     }
+
+    public class InvalidDualSubscription : ISubscription<DualEvent, DualContext>
+    {
+        public void Handle(DualContext context)
+        {
+            
+        }
+    }
+
+    public class ValidDualSubscription : ISubscription<DualEvent, DualContext>, ISubscription<DualEvent>
+    {
+        private Action callback;
+
+        public ValidDualSubscription()
+        {
+
+        }
+
+        public ValidDualSubscription(Action callback)
+        {
+            this.callback = callback;
+        }
+
+        public void Handle(DualContext context)
+        {
+            callback();
+        }
+
+        public void Handle()
+        {
+            callback();
+        }
+    }
 }

@@ -201,5 +201,61 @@ namespace Eve.Tests
             //Assert
             Assert.ThrowsException<ArgumentException>(() =>handler.Subscribe(subscription));
         }
+
+        [TestMethod]
+        public void Handler_ShouldThrow_WhenSubscriptionForDualEvent_IsNotImplementedProperly()
+        {
+            //Arrange
+            var handler = new Handler();
+            var context = new DualContext();
+            var subs = new InvalidDualSubscription();
+            handler.Subscribe(subs);
+
+            //Act
+            handler.Dispatch<DualEvent, DualContext>(context);
+
+            //Assert
+            Assert.ThrowsException<InvalidOperationException>(() => handler.Dispatch<DualEvent>());
+        }
+
+        [TestMethod]
+        public void Handler_ShouldNotThrow_WhenSubscriptionForDualEvent_IsImplementedProperly()
+        {
+            //Arrange
+            var handler = new Handler();
+            var context = new DualContext();
+            var subs = new ValidDualSubscription();
+            handler.Subscribe<DualEvent>(subs);
+
+            //Act
+            //Assert
+            try
+            {
+                handler.Dispatch<DualEvent, DualContext>(context);
+                handler.Dispatch<DualEvent>();
+            }
+            catch (Exception e)
+            {
+                Assert.Fail($"Expected no exception, but got {e.Message}");
+            }
+        }
+
+        [TestMethod]
+        public void Handler_ShouldDispatchAll_WhenSubscriptionForDualEvent_IsImplementedProperly()
+        {
+            //Arrange
+            var subscriptionsHandled = 0;
+            var handler = new Handler();
+            var context = new DualContext();
+            var subs = new ValidDualSubscription(() => subscriptionsHandled++);
+            handler.Subscribe<DualEvent>(subs);
+
+            //Act
+            handler.Dispatch<DualEvent, DualContext>(context);
+            handler.Dispatch<DualEvent>();
+
+            //Assert
+            Assert.AreEqual(2, subscriptionsHandled);
+        }
     }
 }

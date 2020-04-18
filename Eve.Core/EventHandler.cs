@@ -35,9 +35,7 @@ namespace Eve
         {
             var subscription = new InternalContextfulSubscription<TEvent, TEventContext>(action);
 
-            Subscribe(subscription);
-
-            return subscription;
+            return Subscribe(subscription);
         }
 
         public ISubscription<TEvent> Subscribe<TEvent>(Action action)
@@ -45,9 +43,7 @@ namespace Eve
         {
             var subscription = new InternalContextlessSubscription<TEvent>(action);
 
-            Subscribe(subscription);
-
-            return subscription;
+            return Subscribe(subscription);
         }
 
         public void Unsubscribe<TEvent, TEventContext>(ISubscription<TEvent, TEventContext> subscription)
@@ -85,7 +81,14 @@ namespace Eve
             {
                 var subscriptionsToNotify = Subscriptions[key];
 
-                subscriptionsToNotify.ForEach(subscription => ((ISubscription<TEvent, TEventContext>)subscription).Handle(context));
+                subscriptionsToNotify.ForEach(subscription => {
+                    var castedSubscription = subscription as ISubscription<TEvent, TEventContext>;
+
+                    if (castedSubscription == null)
+                        throw new InvalidOperationException($"Subscription {subscription.GetType().FullName} does not implements ISubscription<TEvent, TEventContext>");
+
+                    castedSubscription.Handle(context);
+                });
             }
         }
 
@@ -96,8 +99,16 @@ namespace Eve
             if (Subscriptions.ContainsKey(key))
             {
                 var subscriptionsToNotify = Subscriptions[key];
+                
 
-                subscriptionsToNotify.ForEach(subscription => ((ISubscription<TEvent>)subscription).Handle());
+                subscriptionsToNotify.ForEach(subscription => {
+                    var castedSubscription = subscription as ISubscription<TEvent>;
+
+                    if (castedSubscription == null)
+                        throw new InvalidOperationException($"Subscription {subscription.GetType().FullName} does not implements ISubscription<TEvent>");
+
+                    castedSubscription.Handle();
+                });
             }
         }
 
