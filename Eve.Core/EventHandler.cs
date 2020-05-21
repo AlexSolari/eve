@@ -14,7 +14,7 @@ namespace Eve
         
         public ISubscription<TEvent, TEventContext> Subscribe<TEvent, TEventContext>(ISubscription<TEvent, TEventContext> subscription)
             where TEvent : IContextfulEvent
-            where TEventContext : IEventContext<TEvent>
+            where TEventContext : struct, IEventContext<TEvent>
         {
             AddSubscription<TEvent>(subscription);
 
@@ -31,7 +31,7 @@ namespace Eve
 
         public ISubscription<TEvent, TEventContext> Subscribe<TEvent, TEventContext>(Action<TEventContext> action) 
             where TEvent : IContextfulEvent
-            where TEventContext : IEventContext<TEvent>
+            where TEventContext : struct, IEventContext<TEvent>
         {
             var subscription = new InternalContextfulSubscription<TEvent, TEventContext>(action);
 
@@ -48,7 +48,7 @@ namespace Eve
 
         public void Unsubscribe<TEvent, TEventContext>(ISubscription<TEvent, TEventContext> subscription)
             where TEvent : IContextfulEvent
-            where TEventContext : IEventContext<TEvent>
+            where TEventContext : struct, IEventContext<TEvent>
         {
             var wasRemoved = false || RemoveSubscription(subscription, GetEventKey<TEvent>());
             if (!wasRemoved)
@@ -69,13 +69,8 @@ namespace Eve
 
         public void Dispatch<TEvent, TEventContext>(TEventContext context)
             where TEvent : IContextfulEvent
-            where TEventContext : IEventContext<TEvent>
+            where TEventContext : struct, IEventContext<TEvent>
         {
-            if (context == null)
-            {
-                throw new ArgumentException("Context cannot be null");
-            }
-
             var key = GetEventKey<TEvent>();
             if (Subscriptions.ContainsKey(key))
             {

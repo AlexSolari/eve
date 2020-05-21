@@ -32,6 +32,36 @@ namespace Eve.Tests
         }
 
         [TestMethod]
+        public void Handler_ContextShouldNot_BeChanged()
+        {
+            //Arrange
+            var handler = new Handler();
+            var context = new Context()
+            {
+                Data = 0
+            };
+
+            //Act
+            //Assert
+            handler.Subscribe<ContextfulEvent, Context>((ctx) => {
+                Assert.AreEqual(ctx.Data, 0);
+                ctx.Data += 1;
+            });
+            handler.Subscribe<ContextfulEvent, Context>((ctx) => {
+                Assert.AreEqual(ctx.Data, 0);
+                ctx.Data += 1;
+            });
+            handler.Subscribe<ContextfulEvent, Context>((ctx) => {
+                Assert.AreEqual(ctx.Data, 0);
+                ctx.Data += 1;
+            });
+
+            handler.Dispatch<ContextfulEvent, Context>(context);
+
+            Assert.AreEqual(context.Data, 0);
+        }
+
+        [TestMethod]
         public void Handler_ShouldNotify_ContexfulLambda()
         {
             //Arrange
@@ -175,19 +205,6 @@ namespace Eve.Tests
             //Act
             //Assert
             Assert.ThrowsException<ArgumentException>(() => handler.Subscribe(subscription));
-        }
-
-        [TestMethod]
-        public void Handler_ShouldThrow_WhenDispatching_IfContextIsNull()
-        {
-            //Arrange
-            var handler = new Handler();
-            var subscription = new ContextfulSubscription();
-            handler.Subscribe(subscription);
-
-            //Act
-            //Assert
-            Assert.ThrowsException<ArgumentException>(() => handler.Dispatch<ContextfulEvent, Context>(null));
         }
 
         [TestMethod]

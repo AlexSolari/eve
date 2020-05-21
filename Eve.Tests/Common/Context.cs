@@ -5,13 +5,18 @@ using System.Text;
 
 namespace Eve.Tests.Common
 {
-    public class Context : IEventContext<ContextfulEvent>
+    public struct Context : IEventContext<ContextfulEvent>
     {
         public int Data { get; set; }
     }
 
-    public class DualContext : IEventContext<DualEvent>
+    public struct DualContext : IEventContext<DualEvent>
     {
-        public int Data { get; set; } = 42;
+        public int Data { get; set; }
+
+        public DualContext(int data = 42)
+        {
+            Data = data;
+        }
     }
 }
