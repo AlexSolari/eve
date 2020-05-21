@@ -222,9 +222,10 @@ namespace Eve.Tests
         public void Handler_ShouldNotThrow_WhenSubscriptionForDualEvent_IsImplementedProperly()
         {
             //Arrange
+            var timesDispatched = 0;
             var handler = new Handler();
             var context = new DualContext();
-            var subs = new ValidDualSubscription();
+            var subs = new ValidDualSubscription(() => { timesDispatched++; });
             handler.Subscribe<DualEvent>(subs);
 
             //Act
@@ -238,6 +239,7 @@ namespace Eve.Tests
             {
                 Assert.Fail($"Expected no exception, but got {e.Message}");
             }
+            Assert.AreEqual(timesDispatched, 2);
         }
 
         [TestMethod]
