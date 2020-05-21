@@ -1,20 +1,18 @@
 # Eve
 Lightweight event management system.
 
-https://www.nuget.org/packages/Eve/
-
 ## Usage
 Create a new instance of `EventHandler` and use it to manage events via Subscribe, Unsubscribe and Dispatch operations.
 
 To create an event create a class that implements either `IContextfulEvent` or `IContextlessEvent`.
-In case you want to have context available for event you need it to implement `IContextfulEvent` and create a context class that will implement `IEventContext`.
+In case you want to have context available for event you need it to implement `IContextfulEvent` and create a context struct that will implement `IEventContext`.
 Example:
 ```c#
     class Event : IContextfulEvent { }
 
-    class EventContext : IEventContext<Event> 
+    struct EventContext : IEventContext<Event> 
     {
-        public int MyData = 42;
+        public int MyData;
     }
 ```
 
